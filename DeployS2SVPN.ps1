@@ -12,7 +12,6 @@ $GwSubnet1   = "GatewaySubnet"
 $FEPrefix1   = "10.1.0.0/24"
 $BEPrefix1   = "10.1.1.0/24"
 $GwPrefix1   = "10.1.255.0/27"
-$DNS1        = "8.8.8.8"
 $GwIP1       = "VNet1GWIP"
 $GwIPConf1   = "gwipconf1"
 # On-premises network - LNGIP1 is the VPN device public IP address
@@ -55,7 +54,7 @@ New-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroupName $RG1 `
 
 # 6. Create a local network gateway
 New-AzLocalNetworkGateway -Name $LNG1 -ResourceGroupName $RG1 `
--Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2 -EnableBGP $True
+-Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2
 
 # 7. Create a S2S VPN connection
 $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
@@ -70,7 +69,7 @@ New-AzVirtualNetworkGatewayConnection -Name $Connection1 -ResourceGroupName $RG1
 $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
 Set-AzVirtualNetworkGateway -VirtualNetworkGateway $vng1 -Asn $VNet1ASN
 
-$lng1 = Get-AzLocalNetworkGateway   -Name $LNG1 -ResourceGroupName $RG1
+$lng1 = Get-AzLocalNetworkGateway -Name $LNG1 -ResourceGroupName $RG1
 Set-AzLocalNetworkGateway -LocalNetworkGateway $lng1 `
 -Asn $LNGASN1 -BgpPeeringAddress $BGPPeerIP1
 

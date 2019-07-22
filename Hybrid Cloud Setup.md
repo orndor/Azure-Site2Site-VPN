@@ -86,7 +86,7 @@
 
     ```powershell
     New-AzLocalNetworkGateway -Name $LNG1 -ResourceGroupName $RG1 `
-    -Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2 -EnableBGP $True
+    -Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2
     ```
 
 9. Create a S2S VPN connection
