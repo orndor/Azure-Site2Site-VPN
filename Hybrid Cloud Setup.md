@@ -1,6 +1,6 @@
 # Steps to setup Hybrid Cloud with GNS3
 
-1. Install Azure PowerShell module. (Instructions)[https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-2.4.0]
+1. Install Azure PowerShell module. [Instructions](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-2.4.0)
 
     ```powershell
     Install-Module -Name Az -AllowClobber -Scope CurrentUser
