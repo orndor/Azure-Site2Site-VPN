@@ -35,7 +35,7 @@
     $LNG1        = "VPNsite1"
     $LNGprefix1  = "10.101.0.0/24"
     $LNGprefix2  = "10.101.1.0/24"
-    $LNGIP1      = "65.191.34.68"
+    $LNGIP1      = "65.191.34.34"
     # On-premises BGP properties
     $LNGASN1     = 65011
     $BGPPeerIP1  = "10.101.1.254"
