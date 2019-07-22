@@ -50,30 +50,16 @@ $gwipconf = New-AzVirtualNetworkGatewayIpConfig -Name $GwIPConf1 `
 # 5. Create a VPN gateway (this will take up to 45 minutes)
 New-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroupName $RG1 `
 -Location $Location1 -IpConfigurations $gwipconf -GatewayType Vpn `
--VpnType RouteBased -GatewaySku VpnGw1
+-VpnType RouteBased -GatewaySku VpnGw1 -EnableBgp $True -Asn $VNet1ASN
 
 # 6. Create a local network gateway
 New-AzLocalNetworkGateway -Name $LNG1 -ResourceGroupName $RG1 `
--Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2
+-Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2 -Asn $LNGASN1 -BgpPeeringAddress $BGPPeerIP1
 
-# 7. Create a S2S VPN connection
+# 7. Create a S2S VPN connection with BGP Enabled
 $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
 $lng1 = Get-AzLocalNetworkGateway   -Name $LNG1 -ResourceGroupName $RG1
 
 New-AzVirtualNetworkGatewayConnection -Name $Connection1 -ResourceGroupName $RG1 `
 -Location $Location1 -VirtualNetworkGateway1 $vng1 -LocalNetworkGateway2 $lng1 `
--ConnectionType IPsec -SharedKey "Azure@!b2C3"
-
-# 8. Enable BGP on the VPN connection
-
-$vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
-Set-AzVirtualNetworkGateway -VirtualNetworkGateway $vng1 -Asn $VNet1ASN
-
-$lng1 = Get-AzLocalNetworkGateway   -Name $LNG1 -ResourceGroupName $RG1
-Set-AzLocalNetworkGateway -LocalNetworkGateway $lng1 -Asn $LNGASN1 -BgpPeeringAddress $BGPPeerIP1
-
-$connection = Get-AzVirtualNetworkGatewayConnection `
--Name $Connection1 -ResourceGroupName $RG1
-
-Set-AzVirtualNetworkGatewayConnection -VirtualNetworkGatewayConnection $connection `
--EnableBGP $True
+-ConnectionType IPsec -SharedKey "Azure@!b2C3" -EnableBGP $True

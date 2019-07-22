@@ -79,7 +79,7 @@
     ```powershell
     New-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroupName $RG1 `
     -Location $Location1 -IpConfigurations $gwipconf -GatewayType Vpn `
-    -VpnType RouteBased -GatewaySku VpnGw1
+    -VpnType RouteBased -GatewaySku VpnGw1 -EnableBgp $True -Asn $VNet1ASN
     ```
 
 8. Create a local network gateway
@@ -89,7 +89,7 @@
     -Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2
     ```
 
-9. Create a S2S VPN connection
+9. Create a S2S VPN connection with BGP Enabled
 
     ```powershell
     $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
@@ -97,52 +97,37 @@
 
     New-AzVirtualNetworkGatewayConnection -Name $Connection1 -ResourceGroupName $RG1 `
     -Location $Location1 -VirtualNetworkGateway1 $vng1 -LocalNetworkGateway2 $lng1 `
-    -ConnectionType IPsec -SharedKey "Azure@!b2C3"
+    -ConnectionType IPsec -SharedKey "Azure@!b2C3" -EnableBGP $True
     ```
 
-10. Enable BGP on the VPN connection
+10. Download Premise equipment sample configs.  Got to [this site.](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-download-vpndevicescript)
+
+## Verification and Troubleshooting commands for the CLI
+
+* View the gateway public IP address
 
     ```powershell
-    $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
-    Set-AzVirtualNetworkGateway -VirtualNetworkGateway $vng1 -Asn $VNet1ASN
-
-    $lng1 = Get-AzLocalNetworkGateway   -Name $LNG1 -ResourceGroupName $RG1
-    Set-AzLocalNetworkGateway -LocalNetworkGateway $lng1 `
-    -Asn $LNGASN1 -BgpPeeringAddress $BGPPeerIP1
-
-    $connection = Get-AzVirtualNetworkGatewayConnection `
-    -Name $Connection1 -ResourceGroupName $RG1
-
-    Set-AzVirtualNetworkGatewayConnection -VirtualNetworkGatewayConnection $connection `
-    -EnableBGP $True
+    $myGwIp = Get-AzPublicIpAddress -Name $GwIP1 -ResourceGroup $RG1
+    $myGwIp.IpAddress
     ```
 
-11. Download Premise equipment sample configs.  Got to [this site.](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-download-vpndevicescript)
+* Resize a gateway
 
-12. Verification and Troubleshooting commands for the CLI:
+    ```powershell
+    $gateway = Get-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroup $RG1
+    Resize-AzVirtualNetworkGateway -GatewaySku VpnGw2 -VirtualNetworkGateway $gateway
+    ```
 
-    * View the gateway public IP address
+* Reset a gateway (for troubleshooting)
 
-        ```powershell
-        $myGwIp = Get-AzPublicIpAddress -Name $GwIP1 -ResourceGroup $RG1
-        $myGwIp.IpAddress
-        ```
+    ```powershell
+    $gateway = Get-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroup $RG1
+    Reset-AzVirtualNetworkGateway -VirtualNetworkGateway $gateway
+    ```
 
-    * Resize a gateway
+## Removal and Clean-Up
 
-        ```powershell
-        $gateway = Get-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroup $RG1
-        Resize-AzVirtualNetworkGateway -GatewaySku VpnGw2 -VirtualNetworkGateway $gateway
-        ```
-
-    * Reset a gateway (for troubleshooting)
-
-        ```powershell
-        $gateway = Get-AzVirtualNetworkGateway -Name $Gw1 -ResourceGroup $RG1
-        Reset-AzVirtualNetworkGateway -VirtualNetworkGateway $gateway
-        ```
-
-13. Delete a Site-to-Site VPN connection
+* Delete a Site-to-Site VPN connection
 
     ```powershell
     Remove-AzVirtualNetworkGatewayConnection -Name $Connection1 -ResourceGroupName $RG1
@@ -150,7 +135,7 @@
     Remove-AzVirtualNetworkGatewayConnection -Name $LNG1 -ResourceGroupName $RG1
     ```
 
-14. Clean up resources (this deletes everything)
+* Clean up resources (this deletes everything)
 
     ```powershell
     Remove-AzResourceGroup -Name $RG1
