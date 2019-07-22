@@ -1,0 +1,99 @@
+! Example Router Config
+! ---------------------------------------------------------------------------------------------------------------------
+! WAN INTERFACE (WHERE THE PUBLIC IP OF CISCO ISR PORT IS LOCATED)
+!		REPLACE the WAN public (ISP) IP subnet as needed. In this example, it's '255.255.252.0', denoting a /22 ISP Public IP subnet
+interface e0/0
+ description OUTSIDE
+ ip address dhcp
+ mac-address 985F.D3D8.A6C7
+ no shut
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! IKEv2 PROPOSAL
+
+crypto ikev2 proposal azure-proposal-VNet1ToSite1
+ encryption aes-cbc-256 aes-cbc-128
+ integrity sha1 sha256
+ group 2 14 24
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! IKEv2 POLICY
+
+crypto ikev2 policy azure-policy-VNet1ToSite1
+ proposal azure-proposal-VNet1ToSite1
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! IKEv2 KEYRING (PRE-SHARED KEY)
+
+crypto ikev2 keyring azure-keyring-VNet1ToSite1
+ peer 40.117.93.144
+  address 40.117.93.144
+  pre-shared-key Azure@!b2C3
+!
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! IKEv2 PROFILE 
+! NOTE: Interface 'e0/0' was picked as the LAN interface where on-Premises networks are connected.
+!		REPLACE as needed.
+crypto ikev2 profile azure-profile-VNet1ToSite1
+ match address local interface e0/0
+ match identity remote address 40.117.93.144 255.255.255.255
+ authentication local pre-share
+ authentication remote pre-share
+ !The line below is invalid in the MS provided config..."VNet1ToSite1" is left off.
+ keyring local azure-keyring-VNet1ToSite1
+ lifetime 28800
+ dpd 10 5 on-demand
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! IPSEC TRANSFORM 
+! 	NOTE: Some (older) Cisco platforms do not support sha256, so the line that is commented out below will apply to those particular products :
+!
+crypto ipsec transform-set azure-ipsec-proposal-set esp-aes 256 esp-sha256-hmac
+!crypto ipsec transform-set azure-ipsec-proposal-set esp-aes 256 esp-sha-hmac
+!
+!The line below is too long...chopped off "-VNet1ToSite1"
+crypto ipsec profile azure-ipsec-profile
+ set security-association lifetime kilobytes 102400000
+ set transform-set azure-ipsec-proposal-set
+ set ikev2-profile azure-profile-VNet1ToSite1
+!
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! TUNNEL INTERFACE FOR ROUTEBASED ROUTING TO AZURE
+! Note: 'Tunnel100' was picked as an arbitrary interface name. 
+!		REPLACE as needed.
+interface Tunnel100
+ ip address 10.101.1.254 255.255.255.254
+ ip tcp adjust-mss 1350
+ tunnel source e0/0
+ tunnel mode ipsec ipv4
+ tunnel destination 40.117.93.144
+ tunnel protection ipsec profile azure-ipsec-profile
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! LAN INTERFACE (WHERE THE ONPREMISES NETWORKS ARE LOCATED)
+interface l0
+ ip address 1.1.1.1 255.255.255.0   
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! BGP ROUTER CONFIGURATION
+! NOTE: Change your LAN BGP Advertisements (under the IPV4 Addr Family) as needed for your tunnel
+router bgp 65011
+ bgp log-neighbor-changes
+ neighbor 10.1.255.30 remote-as 65010 
+ neighbor 10.1.255.30 ebgp-multihop 255
+ neighbor 10.1.255.30 update-source Tunnel100
+ !
+ address-family ipv4
+  network 1.1.1.0 mask 255.255.255.0
+  neighbor 10.1.255.30 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+! ---------------------------------------------------------------------------------------------------------------------
+! STATIC ROUTES TO ENSURE AZURE-SPECIFIC TRAFFIC CROSSES THE TUNNEL INTERFACE BEFORE GETTING OUTSIDE
+ip route 10.1.255.30 255.255.255.255 Tunnel100
+
+

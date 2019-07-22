@@ -69,9 +69,8 @@ New-AzVirtualNetworkGatewayConnection -Name $Connection1 -ResourceGroupName $RG1
 $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
 Set-AzVirtualNetworkGateway -VirtualNetworkGateway $vng1 -Asn $VNet1ASN
 
-$lng1 = Get-AzLocalNetworkGateway -Name $LNG1 -ResourceGroupName $RG1
-Set-AzLocalNetworkGateway -LocalNetworkGateway $lng1 `
--Asn $LNGASN1 -BgpPeeringAddress $BGPPeerIP1
+$lng1 = Get-AzLocalNetworkGateway   -Name $LNG1 -ResourceGroupName $RG1
+Set-AzLocalNetworkGateway -LocalNetworkGateway $lng1 -Asn $LNGASN1 -BgpPeeringAddress $BGPPeerIP1
 
 $connection = Get-AzVirtualNetworkGatewayConnection `
 -Name $Connection1 -ResourceGroupName $RG1
