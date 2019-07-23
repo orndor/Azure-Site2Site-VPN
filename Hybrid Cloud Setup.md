@@ -100,7 +100,7 @@
     -ConnectionType IPsec -SharedKey "Azure@!b2C3" -EnableBGP $True
     ```
 
-10. Download Premise equipment sample configs.  Got to [this site.](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-download-vpndevicescript)
+10. Download Premise equipment sample configs.  Go to [here.](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-download-vpndevicescript)
 
 ## Verification and Troubleshooting commands for the CLI
 
