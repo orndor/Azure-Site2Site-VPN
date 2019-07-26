@@ -86,7 +86,9 @@
 
     ```powershell
     New-AzLocalNetworkGateway -Name $LNG1 -ResourceGroupName $RG1 `
-    -Location 'East US' -GatewayIpAddress $LNGIP1 -AddressPrefix $LNGprefix1,$LNGprefix2
+    -Location 'East US' -GatewayIpAddress $LNGIP1 `
+    -AddressPrefix $LNGprefix1,$LNGprefix2 -Asn $LNGASN1 `
+    -BgpPeeringAddress $BGPPeerIP1
     ```
 
 9. Create a S2S VPN connection with BGP Enabled
@@ -95,8 +97,9 @@
     $vng1 = Get-AzVirtualNetworkGateway -Name $GW1  -ResourceGroupName $RG1
     $lng1 = Get-AzLocalNetworkGateway   -Name $LNG1 -ResourceGroupName $RG1
 
-    New-AzVirtualNetworkGatewayConnection -Name $Connection1 -ResourceGroupName $RG1 `
-    -Location $Location1 -VirtualNetworkGateway1 $vng1 -LocalNetworkGateway2 $lng1 `
+    New-AzVirtualNetworkGatewayConnection -Name $Connection1 `
+    -ResourceGroupName $RG1 -Location $Location1 `
+    -VirtualNetworkGateway1 $vng1 -LocalNetworkGateway2 $lng1 `
     -ConnectionType IPsec -SharedKey "Azure@!b2C3" -EnableBGP $True
     ```
 
