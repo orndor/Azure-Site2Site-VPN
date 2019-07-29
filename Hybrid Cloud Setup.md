@@ -1,5 +1,7 @@
 # Steps to setup Hybrid Cloud with GNS3
 
+## Head to [my blog article](https://www.roborndoff.com/2019/07/28/azure-advanced-networking/) on this topic to get the full writeup on this tutorial
+
 1. Install Azure PowerShell module. [Instructions](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-2.4.0)
 
     ```powershell
@@ -20,7 +22,7 @@
     $VNet1       = "VNet1"
     $Location1   = "East US"
     $VNet1Prefix = "10.1.0.0/16"
-    $VNet1ASN    = 65010
+    $VNet1ASN    = 65001
     $GW1         = "VNet1GW"
     $FESubnet1   = "FrontEnd"
     $BESubnet1   = "Backend"
@@ -28,7 +30,6 @@
     $FEPrefix1   = "10.1.0.0/24"
     $BEPrefix1   = "10.1.1.0/24"
     $GwPrefix1   = "10.1.255.0/27"
-    $DNS1        = "8.8.8.8"
     $GwIP1       = "VNet1GWIP"
     $GwIPConf1   = "gwipconf1"
     # On-premises network - LNGIP1 is the VPN device public IP address
@@ -37,7 +38,7 @@
     $LNGprefix2  = "10.101.1.0/24"
     $LNGIP1      = "65.191.34.34"
     # On-premises BGP properties
-    $LNGASN1     = 65011
+    $LNGASN1     = 65000
     $BGPPeerIP1  = "10.101.1.254"
     # Connection
     $Connection1 = "VNet1ToSite1"
@@ -104,8 +105,29 @@
     ```
 
 10. Download Premise equipment sample configs.  Go to [here.](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-download-vpndevicescript)
+    or run the following Powershell snippet:
+    
+    ```powershell
+    $RG          = "TestRG1"
+    $GWName      = "VNet1GW"
+    $Connection  = "VNet1toSite1"
+
+    Get-AzVirtualNetworkGatewayConnectionVpnDeviceConfigScript `
+    -Name $Connection -ResourceGroupName $RG -DeviceVendor Cisco `
+    -DeviceFamily "Cisco-ISR(IOS)" -FirmwareVersion "Cisco-ISR-15.x--IKEv2+BGP"
 
 ## Verification and Troubleshooting commands for the CLI
+
+* Verify the status of the VPN connection
+
+    ```powershell
+    Get-AzVirtualNetworkGatewayConnection -Name VNet1toSite1 -ResourceGroupName TestRG1
+    ```
+
+* Get the BGP peer status
+    ```powershell
+    Get-AzureRmVirtualNetworkGatewayBGPPeerStatus -VirtualNetworkGatewayName VNet1GW -ResourceGroupName TestRG1
+    ```
 
 * View the gateway public IP address
 

@@ -4,7 +4,7 @@ $RG1         = "TestRG1"
 $VNet1       = "VNet1"
 $Location1   = "East US"
 $VNet1Prefix = "10.1.0.0/16"
-$VNet1ASN    = 65010
+$VNet1ASN    = 65001
 $GW1         = "VNet1GW"
 $FESubnet1   = "FrontEnd"
 $BESubnet1   = "Backend"
@@ -18,9 +18,9 @@ $GwIPConf1   = "gwipconf1"
 $LNG1        = "VPNsite1"
 $LNGprefix1  = "10.101.0.0/24"
 $LNGprefix2  = "10.101.1.0/24"
-$LNGIP1      = "65.191.34.68"
+$LNGIP1      = "65.191.34.34"
 # On-premises BGP properties
-$LNGASN1     = 65011
+$LNGASN1     = 65000
 $BGPPeerIP1  = "10.101.1.254"
 # Connection
 $Connection1 = "VNet1ToSite1"
