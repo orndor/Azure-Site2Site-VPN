@@ -348,5 +348,6 @@ healthchecksdb
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
 
-# Visual Studio Code workspace files
+# Visual Studio Code Workspace files
 .code-workspace
+.vscode
